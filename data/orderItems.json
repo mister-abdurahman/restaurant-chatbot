@@ -1,0 +1,8 @@
+[
+  {
+    "name": "Pineapple Pizza",
+    "price": 7250
+  },
+  { "name": "Meat Pie", "price": 600 },
+  { "name": "Cake", "price": 300 }
+]

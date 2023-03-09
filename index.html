@@ -5,23 +5,156 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Restaurant chatbot</title>
-    <link rel="stylesheet" href="index.css" />
+    <!-- <link rel="stylesheet" href="index.css" /> -->
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+        box-sizing: border-box;
+      }
+
+      body {
+        height: 100vh;
+        background-color: orange;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .container {
+        width: 850px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
+        background-color: rgb(245, 188, 81);
+      }
+      .header h1 {
+        color: white;
+        padding: 15px;
+      }
+      .options {
+        flex: 1;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.2);
+        padding: 20px 30px;
+      }
+      .options ul {
+        display: flex;
+        list-style-type: none;
+      }
+      .options ul li {
+        margin-inline: 8px;
+      }
+      .options ul li button {
+        font-size: 16px;
+      }
+      .message {
+        background-color: orange;
+        padding: 10px;
+        color: white;
+        width: fit-content;
+        border-radius: 10px;
+        margin-bottom: 10px;
+      }
+      .user_message {
+        margin-left: auto;
+        background-color: white;
+        color: black;
+      }
+      .footer form {
+        display: flex;
+      }
+      form input {
+        flex: 1;
+        height: 40px;
+        border: none;
+        outline: none;
+        padding-left: 5px;
+        font-size: 16px;
+      }
+      form button {
+        width: 100px;
+        font-size: 18px;
+        border: none;
+        outline: none;
+        background-color: orangered;
+        color: white;
+        cursor: pointer;
+      }
+      form button:hover {
+        background-color: rgb(132, 39, 6);
+        transition: 0.2s ease;
+      }
+    </style>
+    <!-- so we get access to socket.io from its package that we installed -->
   </head>
   <body>
     <div class="container">
       <div class="header">
         <h1>Pizza Order Assistant</h1>
       </div>
-      <div class="body">
-        <p class="message">Hello</p>
-        <p class="message user_message">Hi</p>
+      <div class="options">
+        <ul>
+          <li>
+            <button class="option1">
+              Select <strong>1.</strong> to place an order
+            </button>
+          </li>
+          <li>
+            <button class="option99">
+              Select <strong>99.</strong> to checkout order
+            </button>
+          </li>
+          <li>
+            <button class="option98">
+              Select <strong>98.</strong> to see order history
+            </button>
+          </li>
+          <li>
+            <button class="option97">
+              Select <strong>97.</strong> to see current order
+            </button>
+          </li>
+          <li>
+            <button class="option0">
+              Select <strong>0.</strong> to cancel order
+            </button>
+          </li>
+        </ul>
       </div>
       <div class="footer">
         <form action="">
           <input type="text" />
-          <button>Send</button>
+          <button type="submit" id="submit">Send</button>
         </form>
       </div>
     </div>
+    <script src="socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      socket.on("connect", () => {
+        // the socket.id of this socket is same as that of the server which means they are connected
+        //the same socket is used for the server and client
+        console.log(socket.id);
+      });
+
+      const btn = document.getElementById("submit");
+      btn.addEventListener("click", () => {
+        // emitting events
+        socket.emit("message", "this message is from client");
+      });
+
+      //handling an event emitted from the server
+      socket.on("server-message", (msg) => {
+        console.log(`server message: ${msg}`);
+      });
+
+      // if we dont know the server event id(name):
+      // const listener = (eventName, ...args) => {
+      //   console.log(eventName, args);
+      // };
+      // socket.onAny(listener);
+    </script>
   </body>
 </html>

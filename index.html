@@ -126,6 +126,23 @@
         bottom: 0;
         margin: 10px 80px 0 80px;
       }
+      .add-to-cart-text{
+        margin: 80px 0 80px 0;
+        color: white;
+        font-size: large;
+      }
+      .order-completed{
+        font-size: larger;
+        color: green;
+        font-weight: bolder;
+        font-style: oblique;
+      }
+      .order-not-completed{
+        font-size: larger;
+        color: red;
+        font-weight: bolder;
+        font-style: oblique;
+      }
     </style>
     <!-- so we get access to socket.io from its package that we installed -->
   </head>
@@ -142,7 +159,7 @@
             </button>
           </li>
           <li>
-            <button class="option99">
+            <button class="option99" id="option99">
               Select <strong>99.</strong> to checkout order
             </button>
           </li>
@@ -186,6 +203,9 @@
 
       const option1 = document.getElementById("option1");
       const Option1List = document.getElementById('listOption1')
+      const placeOrderBtn = document.getElementById('place-order')
+      const h6Text = document.getElementById('item-name')
+      const flexContainer = document.querySelector('#flex-container')
 
       option1.addEventListener("click", () => {
         // emitting events
@@ -218,16 +238,46 @@
           `
           );
         });
-
-        const placeOrderBtn = document.getElementById('place-order')
-        const h6Text = document.getElementById('item-name')
         
-        placeOrderBtn.addEventListener('click', function(e){
+        flexContainer.addEventListener('click', function(e){
         e.preventDefault();
-        socket.emit('items_ordered', h6Text.textContent)
+        const theItemName = document.getElementById(`${e.target.id}`).id.replace("place-order-", '')
+        const flexBox = document.getElementById(`${theItemName}`)
+        if(flexBox){
+          flexBox.innerHTML = `
+          <h3 class='add-to-cart-text'>Item has been added to cart✔</h3>
+          `
+        }
+        socket.emit('items_ordered', theItemName)
       })
       });
 
+      const option99 = document.getElementById("option99");
+      option99.addEventListener('click', function(e){
+        flexContainer.innerHTML = ``
+        
+        socket.emit('completed_orders', 'order completed')
+      })
+      
+      socket.on("ordered_items_array", (data)=>{
+        if(data.length > 0){
+          console.log(data)
+          flexContainer.innerHTML = `
+          <h1 class='order-completed'> Order Completed 🎉 </h1>
+          `
+        }
+        else{
+          flexContainer.innerHTML = `
+          <h1 class='order-not-completed'> No order to place, Press 1️⃣ to place an order  </h1>
+          `
+
+          Option1List.innerHTML = `
+        <button class="option1" id="option1">
+              Select <strong>1.</strong> to place an order
+        </button>
+        `
+        }
+      })
    
     
       

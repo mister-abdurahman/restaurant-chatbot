@@ -32,7 +32,18 @@ io.on("connection", async (socket) => {
   });
   socket.on("items_ordered", (itemName) => {
     console.log(itemName);
-    orderedItemsArray.push(itemName);
+    orderedItemsArray.push({
+      name: itemName,
+      time: new Date(),
+      orderStatus: "added to cart",
+    });
+  });
+
+  socket.on("completed_orders", (orderCompleted) => {
+    orderedItemsArray.forEach((element) => {
+      element.orderStatus = orderCompleted;
+    });
+    socket.emit("ordered_items_array", orderedItemsArray);
   });
 });
 

@@ -126,18 +126,18 @@
         bottom: 0;
         margin: 10px 80px 0 80px;
       }
-      .add-to-cart-text{
+      .add-to-cart-text {
         margin: 80px 0 80px 0;
         color: white;
         font-size: large;
       }
-      .order-completed{
+      .order-completed {
         font-size: larger;
         color: green;
         font-weight: bolder;
         font-style: oblique;
       }
-      .order-not-completed{
+      .order-not-completed {
         font-size: larger;
         color: red;
         font-weight: bolder;
@@ -187,9 +187,9 @@
             <h6 class="item-name">place item here</h6>
             <img src="" alt="" />
             <p class="price-tag"></p>
-          </div>
-        </div> -->
-       </div>
+          </div> -->
+        </div>
+      </div>
     </div>
 
     <script src="socket.io/socket.io.js"></script>
@@ -202,24 +202,28 @@
       });
 
       const option1 = document.getElementById("option1");
-      const Option1List = document.getElementById('listOption1')
-      const placeOrderBtn = document.getElementById('place-order')
-      const h6Text = document.getElementById('item-name')
-      const flexContainer = document.querySelector('#flex-container')
+      const Option1List = document.getElementById("listOption1");
+      const placeOrderBtn = document.getElementById("place-order");
+      const h6Text = document.getElementById("item-name");
+      const flexContainer = document.querySelector("#flex-container");
 
       option1.addEventListener("click", () => {
         // emitting events
+        console.log("workingggggggg?");
         socket.emit("items_to_order", 1);
         // disabling the button 1
         Option1List.innerHTML = `
         <button disabled class="option1" id="option1">
               Select <strong>1.</strong> to place an order
         </button>
-        `
+        `;
       });
 
       socket.on("the_items_to_order", (data) => {
         // const flexContainer = document.getElementById("flex-container");
+        flexContainer.innerHTML = `
+        <span class="empty" id="empty"></span>
+        `;
         const emptySpan = document.getElementById("empty");
         data.forEach((element) => {
           emptySpan.insertAdjacentHTML(
@@ -238,49 +242,60 @@
           `
           );
         });
-        
-        flexContainer.addEventListener('click', function(e){
-        e.preventDefault();
-        const theItemName = document.getElementById(`${e.target.id}`).id.replace("place-order-", '')
-        const flexBox = document.getElementById(`${theItemName}`)
-        if(flexBox){
-          flexBox.innerHTML = `
-          <h3 class='add-to-cart-text'>Item has been added to cart✔</h3>
-          `
-        }
-        socket.emit('items_ordered', theItemName)
-      })
+
+        flexContainer.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (document.getElementById(`${e.target.id}`)) {
+            const theItemName = document
+              .getElementById(`${e.target.id}`)
+              .id.replace("place-order-", "");
+            const flexBox = document.getElementById(`${theItemName}`);
+            if (flexBox) {
+              flexBox.innerHTML = `
+                <h3 class='add-to-cart-text'>Item has been added to cart✔</h3>
+                `;
+            }
+            socket.emit("items_ordered", theItemName);
+          }
+        });
       });
 
       const option99 = document.getElementById("option99");
-      option99.addEventListener('click', function(e){
-        flexContainer.innerHTML = ``
-        
-        socket.emit('completed_orders', 'order completed')
-      })
-      
-      socket.on("ordered_items_array", (data)=>{
-        if(data.length > 0){
-          console.log(data)
+      option99.addEventListener("click", function (e) {
+        e.preventDefault();
+        flexContainer.innerHTML = `
+        <span class="empty" id="empty"></span>
+        `;
+
+        socket.emit("completed_orders", "order completed");
+      });
+
+      socket.on("ordered_items_array", (data) => {
+        if (data.length > 0) {
+          console.log(data);
           flexContainer.innerHTML = `
           <h1 class='order-completed'> Order Completed 🎉 </h1>
-          `
-        }
-        else{
-          flexContainer.innerHTML = `
-          <h1 class='order-not-completed'> No order to place, Press 1️⃣ to place an order  </h1>
-          `
+          `;
 
           Option1List.innerHTML = `
-        <button class="option1" id="option1">
+        <button disabled class="option1" id="option1">
               Select <strong>1.</strong> to place an order
         </button>
-        `
+        `;
+        } else {
+          flexContainer.innerHTML = `
+          <span class="empty" id="empty"></span>
+          <h1 class='order-not-completed'> No order to place, Press 1️⃣ to place an order  </h1>
+          `;
+
+          Option1List.innerHTML = `
+          <button class="option1" id="option1">
+                Select <strong>1.</strong> to place an order
+          </button>
+          `;
         }
-      })
-   
-    
-      
+      });
+
       // socket.emit('item_to_be_added_to_cart', )
 
       // if we dont know the server event id(name):

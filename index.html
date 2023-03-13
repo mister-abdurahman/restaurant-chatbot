@@ -16,7 +16,7 @@
 
       body {
         height: 100vh;
-        background-color: orange;
+        /* background-color: orange; */
         display: flex;
         justify-content: center;
         align-items: center;
@@ -34,7 +34,7 @@
         padding: 15px;
       }
       .options {
-        flex: 1;
+        /* flex: 1; */
         color: white;
         background-color: rgba(0, 0, 0, 0.2);
         padding: 20px 30px;
@@ -86,6 +86,46 @@
         background-color: rgb(132, 39, 6);
         transition: 0.2s ease;
       }
+      .flex-container {
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: row;
+        text-align: center;
+        margin: 0 55px;
+      }
+      .flex-box {
+        position: relative;
+        width: 200px;
+        height: 200px;
+        text-align: center;
+        margin: 30px;
+        border-radius: 15px;
+        margin-inline: 10px;
+      }
+      .flex-box img {
+        width: 100%;
+        height: 100%;
+        border-radius: 7px;
+        object-fit: cover;
+        object-position: center;
+      }
+      .item-name {
+        position: absolute;
+        color: blue;
+        font-weight: 700;
+        font-size: 18px;
+        margin: 0 50px;
+      }
+      .price-tag {
+        font-weight: 100;
+        color: blue;
+        font-weight: 800;
+        font-size: small;
+        position: absolute;
+        bottom: 0;
+        margin: 10px 80px 0 80px;
+      }
     </style>
     <!-- so we get access to socket.io from its package that we installed -->
   </head>
@@ -96,8 +136,8 @@
       </div>
       <div class="options">
         <ul>
-          <li>
-            <button class="option1">
+          <li id="listOption1">
+            <button class="option1" id="option1">
               Select <strong>1.</strong> to place an order
             </button>
           </li>
@@ -122,14 +162,19 @@
             </button>
           </li>
         </ul>
-      </div>
-      <div class="footer">
-        <form action="">
-          <input type="text" />
-          <button type="submit" id="submit">Send</button>
-        </form>
-      </div>
+        <div class="response" id="response"></div>
+        <div class="flex-container" id="flex-container">
+          <span class="empty" id="empty"></span>
+          <!-- append from here -->
+          <!-- <div class="flex-box">
+            <h6 class="item-name">place item here</h6>
+            <img src="" alt="" />
+            <p class="price-tag"></p>
+          </div>
+        </div> -->
+       </div>
     </div>
+
     <script src="socket.io/socket.io.js"></script>
     <script>
       const socket = io();
@@ -139,16 +184,54 @@
         console.log(socket.id);
       });
 
-      const btn = document.getElementById("submit");
-      btn.addEventListener("click", () => {
+      const option1 = document.getElementById("option1");
+      const Option1List = document.getElementById('listOption1')
+
+      option1.addEventListener("click", () => {
         // emitting events
-        socket.emit("message", "this message is from client");
+        socket.emit("items_to_order", 1);
+        // disabling the button 1
+        Option1List.innerHTML = `
+        <button disabled class="option1" id="option1">
+              Select <strong>1.</strong> to place an order
+        </button>
+        `
       });
 
-      //handling an event emitted from the server
-      socket.on("server-message", (msg) => {
-        console.log(`server message: ${msg}`);
+      socket.on("the_items_to_order", (data) => {
+        // const flexContainer = document.getElementById("flex-container");
+        const emptySpan = document.getElementById("empty");
+        data.forEach((element) => {
+          emptySpan.insertAdjacentHTML(
+            "afterend",
+            `
+            <div class="flex-box" id="${element.name}">
+            <h6 class="item-name" id="item-name">${element.name}</h6>
+            <img
+              id="image-el"
+              src="${element.image}"
+              alt=""
+            />
+            <p class="price-tag">#${element.price}</p>
+            <button id="place-order-${element.name}">Place order</button>
+          </div>
+          `
+          );
+        });
+
+        const placeOrderBtn = document.getElementById('place-order')
+        const h6Text = document.getElementById('item-name')
+        
+        placeOrderBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        socket.emit('items_ordered', h6Text.textContent)
+      })
       });
+
+   
+    
+      
+      // socket.emit('item_to_be_added_to_cart', )
 
       // if we dont know the server event id(name):
       // const listener = (eventName, ...args) => {

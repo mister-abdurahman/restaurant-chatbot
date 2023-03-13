@@ -14,6 +14,7 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
+const orderedItemsArray = [];
 // create a new connection from the server side
 io.on("connection", async (socket) => {
   console.log("A user connected");
@@ -25,15 +26,25 @@ io.on("connection", async (socket) => {
   });
   socket.on("items_to_order", (data) => {
     if (data === 1) {
+      console.log(data);
       socket.emit("the_items_to_order", database);
     }
   });
-  // socket.on("item_id_to_be_ordered", (data) => {
-  //   console.log(data);
-  //   // socket.emit('available_item_id_to_be_ordered', data)
-  //   // check if this data_id exists in the item data, if it does save it in an array that
-  //   // woul dbe used to checkout order
-  // });
+  socket.on("items_ordered", (itemName) => {
+    console.log(itemName);
+    orderedItemsArray.push({
+      name: itemName,
+      time: new Date(),
+      orderStatus: "added to cart",
+    });
+  });
+
+  socket.on("completed_orders", (orderCompleted) => {
+    orderedItemsArray.forEach((element) => {
+      element.orderStatus = orderCompleted;
+    });
+    socket.emit("ordered_items_array", orderedItemsArray);
+  });
 });
 
 // running this, we are listening to the express server & we need to listen to the socket server
@@ -46,7 +57,8 @@ http.listen(PORT, () => {
   console.log("Server running on 3000");
 });
 
-// when you click 1., the list of items displays nicely on the web, then you click on an item
+// STEPS:
+// when you click 1., the list of items displays on the web, then you click on an item
 // to add it to your cart, when an item is clicked, it should display "added to cart✔",
 // also  the button 1. should be disabled after clicking it to list items for order
 

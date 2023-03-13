@@ -16,7 +16,7 @@
 
       body {
         height: 100vh;
-        background-color: orange;
+        /* background-color: orange; */
         display: flex;
         justify-content: center;
         align-items: center;
@@ -90,34 +90,58 @@
         width: 100%;
         height: auto;
         display: flex;
+        flex-direction: row;
         text-align: center;
-        margin: 0 auto;
+        margin: 0 55px;
       }
       .flex-box {
         position: relative;
         width: 200px;
         height: 200px;
-        background-color: rgb(16, 14, 14);
-        color: white;
         text-align: center;
         margin: 30px;
         border-radius: 15px;
-
         margin-inline: 10px;
       }
       .flex-box img {
         width: 100%;
+        height: 100%;
+        border-radius: 7px;
+        object-fit: cover;
+        object-position: center;
       }
       .item-name {
-        font-weight: 600;
-        font-size: 14px;
+        position: absolute;
+        color: blue;
+        font-weight: 700;
+        font-size: 18px;
+        margin: 0 50px;
       }
       .price-tag {
         font-weight: 100;
-        margin-top: 140px;
+        color: blue;
+        font-weight: 800;
         font-size: small;
         position: absolute;
-        margin: 40px 70px 0 70px;
+        bottom: 0;
+        margin: 10px 80px 0 80px;
+      }
+      .add-to-cart-text{
+        margin: 80px 0 80px 0;
+        color: white;
+        font-size: large;
+      }
+      .order-completed{
+        font-size: larger;
+        color: green;
+        font-weight: bolder;
+        font-style: oblique;
+      }
+      .order-not-completed{
+        font-size: larger;
+        color: red;
+        font-weight: bolder;
+        font-style: oblique;
       }
     </style>
     <!-- so we get access to socket.io from its package that we installed -->
@@ -129,13 +153,13 @@
       </div>
       <div class="options">
         <ul>
-          <li>
+          <li id="listOption1">
             <button class="option1" id="option1">
               Select <strong>1.</strong> to place an order
             </button>
           </li>
           <li>
-            <button class="option99">
+            <button class="option99" id="option99">
               Select <strong>99.</strong> to checkout order
             </button>
           </li>
@@ -157,40 +181,17 @@
         </ul>
         <div class="response" id="response"></div>
         <div class="flex-container" id="flex-container">
+          <span class="empty" id="empty"></span>
           <!-- append from here -->
-          <div class="flex-box">
+          <!-- <div class="flex-box">
             <h6 class="item-name">place item here</h6>
             <img src="" alt="" />
             <p class="price-tag"></p>
           </div>
-          <div class="flex-box">
-            <h6 class="item-name">place item here</h6>
-            <img src="" alt="" />
-            <p class="price-tag"></p>
-          </div>
-          <div class="flex-box">
-            <h6 class="item-name">place item here</h6>
-            <img src="" alt="" />
-            <p class="price-tag"></p>
-          </div>
-          <div class="flex-box">
-            <h6 class="item-name">place item here</h6>
-            <img src="images/cake.jpg" alt="" />
-            <p class="price-tag">#3000</p>
-          </div>
-        </div>
-      </div>
-      <!-- <div class="footer">
-        <form action="">
-          <input
-            type="text"
-            id="submitText"
-            placeholder="Select 1 then enter the id of the item and press send to place an order"
-          />
-          <button type="submit" id="submit">Send</button>
-        </form>
-      </div> -->
+        </div> -->
+       </div>
     </div>
+
     <script src="socket.io/socket.io.js"></script>
     <script>
       const socket = io();
@@ -201,26 +202,86 @@
       });
 
       const option1 = document.getElementById("option1");
+      const Option1List = document.getElementById('listOption1')
+      const placeOrderBtn = document.getElementById('place-order')
+      const h6Text = document.getElementById('item-name')
+      const flexContainer = document.querySelector('#flex-container')
+
       option1.addEventListener("click", () => {
         // emitting events
         socket.emit("items_to_order", 1);
+        // disabling the button 1
+        Option1List.innerHTML = `
+        <button disabled class="option1" id="option1">
+              Select <strong>1.</strong> to place an order
+        </button>
+        `
       });
 
       socket.on("the_items_to_order", (data) => {
-        const slideContainer = document.getElementById("slide-container");
-        data.forEach((element, i) => {
-          slideContainer.insertAdjacentHTML(
+        // const flexContainer = document.getElementById("flex-container");
+        const emptySpan = document.getElementById("empty");
+        data.forEach((element) => {
+          emptySpan.insertAdjacentHTML(
             "afterend",
             `
-            <div class="flex-box">
-             <h6 class="item-name">${element.name}</h6>
-             <img src="${element.image}" alt="" />
-             <p class="price-tag">#${element.price}</p>
-            </div>
+            <div class="flex-box" id="${element.name}">
+            <h6 class="item-name" id="item-name">${element.name}</h6>
+            <img
+              id="image-el"
+              src="${element.image}"
+              alt=""
+            />
+            <p class="price-tag">#${element.price}</p>
+            <button id="place-order-${element.name}">Place order</button>
+          </div>
           `
           );
         });
+        
+        flexContainer.addEventListener('click', function(e){
+        e.preventDefault();
+        const theItemName = document.getElementById(`${e.target.id}`).id.replace("place-order-", '')
+        const flexBox = document.getElementById(`${theItemName}`)
+        if(flexBox){
+          flexBox.innerHTML = `
+          <h3 class='add-to-cart-text'>Item has been added to cart✔</h3>
+          `
+        }
+        socket.emit('items_ordered', theItemName)
+      })
       });
+
+      const option99 = document.getElementById("option99");
+      option99.addEventListener('click', function(e){
+        flexContainer.innerHTML = ``
+        
+        socket.emit('completed_orders', 'order completed')
+      })
+      
+      socket.on("ordered_items_array", (data)=>{
+        if(data.length > 0){
+          console.log(data)
+          flexContainer.innerHTML = `
+          <h1 class='order-completed'> Order Completed 🎉 </h1>
+          `
+        }
+        else{
+          flexContainer.innerHTML = `
+          <h1 class='order-not-completed'> No order to place, Press 1️⃣ to place an order  </h1>
+          `
+
+          Option1List.innerHTML = `
+        <button class="option1" id="option1">
+              Select <strong>1.</strong> to place an order
+        </button>
+        `
+        }
+      })
+   
+    
+      
+      // socket.emit('item_to_be_added_to_cart', )
 
       // if we dont know the server event id(name):
       // const listener = (eventName, ...args) => {

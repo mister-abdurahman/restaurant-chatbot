@@ -35,6 +35,7 @@
       }
       .options {
         /* flex: 1; */
+        height: 100vh;
         color: white;
         background-color: rgba(0, 0, 0, 0.2);
         padding: 20px 30px;
@@ -132,16 +133,57 @@
         font-size: large;
       }
       .order-completed {
+        margin-top: 30px;
+        margin-left: 120px;
         font-size: larger;
         color: green;
         font-weight: bolder;
         font-style: oblique;
       }
       .order-not-completed {
+        margin-top: 30px;
+        margin-left: 120px;
         font-size: larger;
         color: red;
         font-weight: bolder;
         font-style: oblique;
+      }
+      /* .hidden {
+        display: none;
+      } */
+      #order_section {
+        display: none;
+        justify-items: center;
+        align-items: center;
+        margin-top: 100px;
+        cursor: pointer;
+      }
+      #orders {
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      #orders td,
+      #orders th {
+        border: 1px solid #ddd;
+        padding: 8px;
+      }
+
+      #orders tr:nth-child(even) {
+        background-color: #020000;
+      }
+
+      #orders tr:hover {
+        background-color: #ddd;
+      }
+
+      #orders th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: gold;
+        color: white;
       }
     </style>
     <!-- so we get access to socket.io from its package that we installed -->
@@ -164,22 +206,22 @@
             </button>
           </li>
           <li>
-            <button class="option98">
+            <button class="option98" id="option98">
               Select <strong>98.</strong> to see order history
             </button>
           </li>
           <li>
-            <button class="option97">
+            <button class="option97" id="option97">
               Select <strong>97.</strong> to see current order
             </button>
           </li>
           <li>
-            <button class="option0">
+            <button class="option0" id="option0">
               Select <strong>0.</strong> to cancel order
             </button>
           </li>
         </ul>
-        <div class="response" id="response"></div>
+        <div class="current-order" id="current-order"></div>
         <div class="flex-container" id="flex-container">
           <span class="empty" id="empty"></span>
           <!-- append from here -->
@@ -188,6 +230,16 @@
             <img src="" alt="" />
             <p class="price-tag"></p>
           </div> -->
+        </div>
+        <div id="order_section">
+          <h3>Orders</h3>
+          <table id="orders">
+            <tr>
+              <th>Name</th>
+              <th>Date</th>
+              <th>status</th>
+            </tr>
+          </table>
         </div>
       </div>
     </div>
@@ -206,24 +258,26 @@
       const placeOrderBtn = document.getElementById("place-order");
       const h6Text = document.getElementById("item-name");
       const flexContainer = document.querySelector("#flex-container");
+      const orderSection = document.querySelector("#order_section");
+      const orders = document.getElementById("orders");
+      const currentOrder = document.getElementById("current-order");
 
       option1.addEventListener("click", () => {
         // emitting events
         console.log("workingggggggg?");
         socket.emit("items_to_order", 1);
         // disabling the button 1
-        Option1List.innerHTML = `
-        <button disabled class="option1" id="option1">
-              Select <strong>1.</strong> to place an order
-        </button>
+        // Option1List.innerHTML = `
+        // <button disabled class="option1" id="option1">
+        //       Select <strong>1.</strong> to place an order
+        // </button>
+        // `;
+        flexContainer.innerHTML = `
+        <span class="empty" id="empty"></span>
         `;
       });
 
       socket.on("the_items_to_order", (data) => {
-        // const flexContainer = document.getElementById("flex-container");
-        flexContainer.innerHTML = `
-        <span class="empty" id="empty"></span>
-        `;
         const emptySpan = document.getElementById("empty");
         data.forEach((element) => {
           emptySpan.insertAdjacentHTML(
@@ -260,13 +314,12 @@
         });
       });
 
+      // const flexBoxClasses = document.getElementsByClassName("flex-box");
+
       const option99 = document.getElementById("option99");
+
       option99.addEventListener("click", function (e) {
         e.preventDefault();
-        flexContainer.innerHTML = `
-        <span class="empty" id="empty"></span>
-        `;
-
         socket.emit("completed_orders", "order completed");
       });
 
@@ -274,6 +327,7 @@
         if (data.length > 0) {
           console.log(data);
           flexContainer.innerHTML = `
+          <span class="empty" id="empty"></span>
           <h1 class='order-completed'> Order Completed 🎉 </h1>
           `;
 
@@ -287,17 +341,67 @@
           <span class="empty" id="empty"></span>
           <h1 class='order-not-completed'> No order to place, Press 1️⃣ to place an order  </h1>
           `;
+        }
+      });
 
-          Option1List.innerHTML = `
-          <button class="option1" id="option1">
-                Select <strong>1.</strong> to place an order
-          </button>
+      const option98 = document.getElementById("option98");
+
+      option98.addEventListener("click", function (e) {
+        e.preventDefault();
+        orderSection.style.display = "grid";
+        socket.emit("generate_completed_orders", true);
+      });
+      socket.on("completed_orders_list", (orderList) => {
+        // add data to table
+        orderList.forEach((element) => {
+          const row = orders.insertRow(-1);
+
+          let column1 = row.insertCell(0);
+          let column2 = row.insertCell(1);
+          let column3 = row.insertCell(2);
+
+          column1.innerText = element.name;
+          column2.innerText = element.time;
+          column3.innerText = element.orderStatus;
+        });
+      });
+
+      const option97 = document.getElementById("option97");
+
+      option97.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        socket.emit("current_order", "current cart");
+      });
+
+      socket.on("current_order_item", (lastOrderInArray) => {
+        if (lastOrderInArray) {
+          currentOrder.innerHTML = `
+         <p style="color:yellow;text-align:center;font-size: 25px;font-weight: 700"> Your current order is ${lastOrderInArray.name}, placed at ${lastOrderInArray.time} and its status is '${lastOrderInArray.orderStatus}' </p>`;
+        } else {
+          currentOrder.innerHTML = `
+          <p style="color:red;text-align:center;font-size: 25px;font-weight: 700">No current order yet</p>
           `;
         }
       });
 
-      // socket.emit('item_to_be_added_to_cart', )
+      const option0 = document.getElementById("option0");
+      option0.addEventListener("click", function (e) {
+        e.preventDefault();
+        socket.emit("emit_to_cancel_order", 0);
+      });
 
+      socket.on("cancel_order", (data) => {
+        if (data) {
+          currentOrder.innerHTML = `
+            <p style="color:red;text-align:center;font-size: 25px;font-weight: 700">Your current order of ${data.name} placed at ${data.time} has been cancelled 🚮</p>
+            `;
+        } else {
+          currentOrder.innerHTML = `
+            <p style="color:red;text-align:center;font-size: 25px;font-weight: 700">No order to delete</p>
+            `;
+        }
+      });
       // if we dont know the server event id(name):
       // const listener = (eventName, ...args) => {
       //   console.log(eventName, args);

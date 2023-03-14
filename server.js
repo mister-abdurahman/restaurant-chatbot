@@ -45,6 +45,22 @@ io.on("connection", async (socket) => {
     });
     socket.emit("ordered_items_array", orderedItemsArray);
   });
+
+  socket.on("generate_completed_orders", (aBoolean) => {
+    socket.emit("completed_orders_list", orderedItemsArray);
+  });
+
+  socket.on("current_order", (currentOrder) => {
+    socket.emit(
+      "current_order_item",
+      orderedItemsArray[orderedItemsArray.length - 1]
+    );
+  });
+
+  socket.on('emit_to_cancel_order', (data)=>{
+    const lastData = orderedItemsArray.pop()
+    socket.emit('cancel_order', lastData)
+  })
 });
 
 // running this, we are listening to the express server & we need to listen to the socket server
@@ -67,11 +83,10 @@ http.listen(PORT, () => {
 // when a customer clicks 99, the items should disapper, a variable like "orderCompleted: true"
 //  should be added to the items placed for order, and also show a nice message saying:
 // "order completed!" or "no order to place" if theres no item in the array created as stated in [54]...
-// and in this case, the option1. button should be enabled
+// and in this case, the option1. button should be enabled and working
 
 // when a customer clicks 98, all items with the var "orderCompleted: true" should be displayed on the web
 
-// when a customer clicks 97, items added to savedItems but without the "orderCompleted: true" should be displayed
-
+// when a customer clicks 97, the last item in the array should be displayed
 // when a customer clicks 0, items added to savedItems but without the "orderCompleted: true" should be removed from the array
 // if no order to remove, display "no order to cancel, press 1 to place an order"

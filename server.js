@@ -57,10 +57,10 @@ io.on("connection", async (socket) => {
     );
   });
 
-  socket.on('emit_to_cancel_order', (data)=>{
-    const lastData = orderedItemsArray.pop()
-    socket.emit('cancel_order', lastData)
-  })
+  socket.on("emit_to_cancel_order", (data) => {
+    const lastData = orderedItemsArray.pop();
+    socket.emit("cancel_order", lastData);
+  });
 });
 
 // running this, we are listening to the express server & we need to listen to the socket server
@@ -90,3 +90,5 @@ http.listen(PORT, () => {
 // when a customer clicks 97, the last item in the array should be displayed
 // when a customer clicks 0, items added to savedItems but without the "orderCompleted: true" should be removed from the array
 // if no order to remove, display "no order to cancel, press 1 to place an order"
+
+// adjust displaying and hidding/replacing elements, deploy.

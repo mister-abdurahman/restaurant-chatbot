@@ -205,7 +205,7 @@
               Select <strong>99.</strong> to checkout order
             </button>
           </li>
-          <li>
+          <li id="listOption98">
             <button class="option98" id="option98">
               Select <strong>98.</strong> to see order history
             </button>
@@ -255,6 +255,7 @@
 
       const option1 = document.getElementById("option1");
       const Option1List = document.getElementById("listOption1");
+      const Option98List = document.getElementById("listOption98");
       const placeOrderBtn = document.getElementById("place-order");
       const h6Text = document.getElementById("item-name");
       const flexContainer = document.querySelector("#flex-container");
@@ -331,11 +332,11 @@
           <h1 class='order-completed'> Order Completed 🎉 </h1>
           `;
 
-          Option1List.innerHTML = `
-        <button disabled class="option1" id="option1">
-              Select <strong>1.</strong> to place an order
-        </button>
-        `;
+          //   Option1List.innerHTML = `
+          // <button disabled class="option1" id="option1">
+          //       Select <strong>1.</strong> to place an order
+          // </button>
+          // `;
         } else {
           flexContainer.innerHTML = `
           <span class="empty" id="empty"></span>
@@ -352,8 +353,25 @@
         socket.emit("generate_completed_orders", true);
       });
       socket.on("completed_orders_list", (orderList) => {
+        // disable btn
+        Option98List.innerHTML = `
+          <button disabled class="option98" id="option98">
+              Select <strong>98.</strong> to see order history
+            </button>
+          `;
         // add data to table
-        orderList.forEach((element) => {
+        if (orderList.length < 1) {
+          const row = orders.insertRow(-1);
+
+          let column1 = row.insertCell(0);
+          let column2 = row.insertCell(1);
+          let column3 = row.insertCell(2);
+
+          column1.innerText = "Cart is empty";
+          column2.innerText = "Cart is empty";
+          column3.innerText = "Cart is empty";
+        }
+        orderList.forEach((element, i) => {
           const row = orders.insertRow(-1);
 
           let column1 = row.insertCell(0);

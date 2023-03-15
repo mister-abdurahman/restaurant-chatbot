@@ -54,7 +54,7 @@ io.on("connection", async (socket) => {
     socket.emit(
       "current_order_item",
       orderedItemsArray[orderedItemsArray.length - 1]
-    );
+    ); 
   });
 
   socket.on("emit_to_cancel_order", (data) => {
@@ -88,7 +88,7 @@ http.listen(PORT, () => {
 // when a customer clicks 98, all items with the var "orderCompleted: true" should be displayed on the web
 
 // when a customer clicks 97, the last item in the array should be displayed
-// when a customer clicks 0, items added to savedItems but without the "orderCompleted: true" should be removed from the array
+// when a customer clicks 0, the last item in the array should be removed from the array
 // if no order to remove, display "no order to cancel, press 1 to place an order"
 
 // adjust displaying and hidding/replacing elements, deploy.

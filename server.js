@@ -54,7 +54,7 @@ io.on("connection", async (socket) => {
     socket.emit(
       "current_order_item",
       orderedItemsArray[orderedItemsArray.length - 1]
-    ); 
+    );
   });
 
   socket.on("emit_to_cancel_order", (data) => {
@@ -91,4 +91,6 @@ http.listen(PORT, () => {
 // when a customer clicks 0, the last item in the array should be removed from the array
 // if no order to remove, display "no order to cancel, press 1 to place an order"
 
-// adjust displaying and hidding/replacing elements, deploy.
+// sessions
+// center, then put 99, 97 and 0 messages in a border and make it bold and big
+// make it so that when we click btn1, btn98 becomes enabled if it was disabled and also btn98 view disappears if its present

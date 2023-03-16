@@ -7,16 +7,17 @@
     <title>Restaurant chatbot</title>
     <!-- <link rel="stylesheet" href="index.css" /> -->
     <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");
       * {
         margin: 0;
         padding: 0;
-        font-family: sans-serif;
+        font-family: "Poppins", sans-serif;
         box-sizing: border-box;
       }
 
       body {
         height: 100vh;
-        /* background-color: orange; */
+        background-color: orange;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -27,17 +28,19 @@
         display: flex;
         flex-direction: column;
         box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2);
-        background-color: rgb(245, 188, 81);
+        /* background-color: rgb(245, 188, 81); */
       }
       .header h1 {
         color: white;
+        text-align: center;
+        background-color: orangered;
         padding: 15px;
       }
       .options {
         /* flex: 1; */
         height: 100vh;
         color: white;
-        background-color: rgba(0, 0, 0, 0.2);
+        background-color: rgba(228, 225, 225, 0.2);
         padding: 20px 30px;
       }
       .options ul {
@@ -48,7 +51,7 @@
         margin-inline: 8px;
       }
       .options ul li button {
-        font-size: 16px;
+        font-size: 15px;
       }
       .message {
         background-color: orange;
@@ -132,6 +135,7 @@
       .order-completed {
         border: 5px solid green;
         margin: 50px auto 0 auto;
+        text-align: center;
         font-size: 55px;
         color: green;
         font-weight: bolder;
@@ -141,6 +145,7 @@
         border: 5px solid red;
         margin: 50px auto 0 auto;
         font-size: 55px;
+        text-align: center;
         color: red;
         font-weight: bolder;
         font-style: oblique;
@@ -150,6 +155,7 @@
       } */
       .current-order-msg {
         border: 5px solid yellow;
+        text-align: center;
         margin: 50px auto 0 auto;
         font-size: 55px;
         color: yellow;
@@ -278,20 +284,21 @@
       const orderSection = document.querySelector("#order_section");
       const orders = document.getElementById("orders");
       const currentOrder = document.getElementById("current-order");
+      const orderMsg = document.getElementById("order-message");
 
-      function enableButton(btnDOM) {
-        const button = btnDOM;
-        button.disabled = false;
+      function changeAttribute(elementId, attributeName, attributeValue) {
+        const element = document.getElementById(elementId);
+        element.setAttribute(attributeName, attributeValue);
       }
 
       option1.addEventListener("click", () => {
-        enableButton(document.getElementById("option98"));
-        // emitting events
+        // option98.removeAttribute("disabled");
         socket.emit("items_to_order", 1);
 
         flexContainer.innerHTML = `
         <span class="empty" id="empty"></span>
         `;
+        orderMsg.innerText = "";
       });
 
       socket.on("the_items_to_order", (data) => {
@@ -331,8 +338,6 @@
         });
       });
 
-      // const flexBoxClasses = document.getElementsByClassName("flex-box");
-
       const option99 = document.getElementById("option99");
 
       option99.addEventListener("click", function (e) {
@@ -345,34 +350,23 @@
           console.log(data);
           flexContainer.innerHTML = `
           <span class="empty" id="empty"></span>
-          <h1 class='order-completed'> Order Completed 🎉 </h1>
+          <h1 class='order-completed' id="order-message"> Order Completed 🎉 </h1>
           `;
-
-          //   Option1List.innerHTML = `
-          // <button disabled class="option1" id="option1">
-          //       Select <strong>1.</strong> to place an order
-          // </button>
-          // `;
         } else {
           flexContainer.innerHTML = `
           <span class="empty" id="empty"></span>
-          <h1 class='order-not-completed'> No order to place, Press 1️⃣ to place an order  </h1>
+          <h1 class='order-not-completed' id="order-message"> No order to place, Press 1️⃣ to place an order  </h1>
           `;
         }
       });
 
       option98.addEventListener("click", function (e) {
-        e.preventDefault();
+        // e.preventDefault();
         orderSection.style.display = "grid";
         socket.emit("generate_completed_orders", true);
       });
       socket.on("completed_orders_list", (orderList) => {
-        // disable btn
-        Option98List.innerHTML = `
-          <button disabled class="option98" id="option98">
-              Select <strong>98.</strong> to see order history
-            </button>
-          `;
+        // changeAttribute("option98", "disabled", true);
         // add data to table
         if (orderList.length < 1) {
           const row = orders.insertRow(-1);
@@ -384,8 +378,10 @@
           column1.innerText = "Cart is empty";
           column2.innerText = "Cart is empty";
           column3.innerText = "Cart is empty";
+          return;
         }
         orderList.forEach((element, i) => {
+          // if (orderList[i] == orderList[i + 1]) return;
           const row = orders.insertRow(-1);
 
           let column1 = row.insertCell(0);
@@ -408,11 +404,19 @@
 
       socket.on("current_order_item", (lastOrderInArray) => {
         if (lastOrderInArray) {
-          currentOrder.innerHTML = `
-         <p class="current-order-msg"> Your current order is ${lastOrderInArray.name}, placed on ${lastOrderInArray.time} and its status is '${lastOrderInArray.orderStatus}' </p>`;
+          //   currentOrder.innerHTML = `
+          //  <p class="current-order-msg" id="order-message"> Your current order is ${lastOrderInArray.name}, placed on ${lastOrderInArray.time} and its status is '${lastOrderInArray.orderStatus}' </p>`;
+          flexContainer.innerHTML = `
+          <span class="empty" id="empty"></span>
+          <p class="current-order-msg" id="order-message"> Your current order is ${lastOrderInArray.name}, placed on ${lastOrderInArray.time} and its status is '${lastOrderInArray.orderStatus}' </p>
+          `;
         } else {
-          currentOrder.innerHTML = `
-          <p class="order-not-completed">No current order yet</p>
+          // currentOrder.innerHTML = `
+          // <p class="order-not-completed" id="order-message">No current order yet</p>
+          // `;
+          flexContainer.innerHTML = `
+          <span class="empty" id="empty"></span>
+          <p class="order-not-completed" id="order-message">No current order yet</p>
           `;
         }
       });
@@ -425,13 +429,21 @@
 
       socket.on("cancel_order", (data) => {
         if (data) {
-          currentOrder.innerHTML = `
-            <p class='order-not-completed'>Your current order of ${data.name} placed at ${data.time} has been cancelled 🚮</p>
-            `;
+          // currentOrder.innerHTML = `
+          //   <p class='order-not-completed' id="order-message">Your current order of ${data.name} placed at ${data.time} has been cancelled 🚮</p>
+          //   `;
+          flexContainer.innerHTML = `
+          <span class="empty" id="empty"></span>
+          <p class='order-not-completed' id="order-message">Your current order of ${data.name} placed at ${data.time} has been cancelled 🚮</p>
+          `;
         } else {
-          currentOrder.innerHTML = `
-            <p class="order-not-completed">No order to delete</p>
-            `;
+          // currentOrder.innerHTML = `
+          //   <p class="order-not-completed" id="order-message">No order to delete</p>
+          //   `;
+          flexContainer.innerHTML = `
+          <span class="empty" id="empty"></span>
+          <p class="order-not-completed" id="order-message">No order to delete</p>
+          `;
         }
       });
       // if we dont know the server event id(name):

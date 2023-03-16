@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 //   saveUninitialized: false
 // }))
 
-const orderedItemsArray = [];
+let orderedItemsArray = [];
 
 // create a new connection from the server side
 io.on("connection", async (socket) => {
@@ -58,7 +58,12 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("generate_completed_orders", (aBoolean) => {
-    socket.emit("completed_orders_list", orderedItemsArray);
+    let newArr = new Array(...orderedItemsArray)
+    socket.emit("completed_orders_list", newArr);
+    if (aBoolean === true) {
+      newArr = [];
+      aBoolean = false;
+    }
   });
 
   socket.on("current_order", (currentOrder) => {

@@ -1,4 +1,5 @@
 const express = require("express");
+const session = require("express-session");
 const app = express();
 require("./db").connectToMongoDB();
 require("dotenv").config();
@@ -13,13 +14,23 @@ const io = require("socket.io")(http);
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
+// app.use(session({
+//   secret: process.env.SECRET,
+//   resave: false,
+//   saveUninitialized: false
+// }))
 
 const orderedItemsArray = [];
+
 // create a new connection from the server side
 io.on("connection", async (socket) => {
-  console.log("A user connected");
+  //   console.log("A user connected");
 
   const database = await itemDB.find({});
+  const dateObj = new Date();
+  const month = dateObj.getUTCMonth() + 1; //months from 1-12
+  const day = dateObj.getUTCDate();
+  const year = dateObj.getUTCFullYear();
 
   socket.on("disconnect", () => {
     console.log("A user disconnected");
@@ -34,7 +45,7 @@ io.on("connection", async (socket) => {
     console.log(itemName);
     orderedItemsArray.push({
       name: itemName,
-      time: new Date(),
+      time: day + "/" + month + "/" + year,
       orderStatus: "added to cart",
     });
   });

@@ -1,11 +1,12 @@
 const express = require("express");
 const session = require("express-session");
 const app = express();
+const itemDB = require("./model/itemSchema");
 require("./db").connectToMongoDB();
 require("dotenv").config();
 
+// mongodb session config
 const MongoDBStore = require("connect-mongodb-session")(session);
-
 const store = new MongoDBStore({
   uri: process.env.MONGO_DB_URL_CONNECTION,
   collection: "mySessions",
@@ -16,7 +17,6 @@ store.on("error", function (error) {
   console.log(error);
 });
 
-const itemDB = require("./model/itemSchema");
 //
 const PORT = process.env.PORT || 3000;
 const http = require("http").Server(app); //binding our app to the http module
@@ -48,13 +48,6 @@ app.get("/", (req, res) => {
 // create a new connection from the server side
 io.on("connection", async (socket) => {
   const req = socket.request.session;
-
-  console.log("A user connected");
-  console.log(req.id);
-  console.log(req.userId);
-  req.userId = Math.random();
-  req.save();
-  console.log(req.userId);
 
   // const database = await itemDB.find({});
   // const dateObj = new Date();

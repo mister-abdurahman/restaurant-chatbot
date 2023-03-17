@@ -268,8 +268,12 @@
         console.log(socket.id);
       });
 
+      // HTML DOM elements to be manipulated
       const option1 = document.getElementById("option1");
+      const option99 = document.getElementById("option99");
       const option98 = document.getElementById("option98");
+      const option97 = document.getElementById("option97");
+      const option0 = document.getElementById("option0");
       const Option1List = document.getElementById("listOption1");
       const Option98List = document.getElementById("listOption98");
       const placeOrderBtn = document.getElementById("place-order");
@@ -280,6 +284,7 @@
       const currentOrder = document.getElementById("current-order");
       const orderMsg = document.getElementById("order-message");
 
+      // Event function for button 1.
       option1.addEventListener("click", () => {
         socket.emit("items_to_order", 1);
 
@@ -309,6 +314,7 @@
           );
         });
 
+        // Event function for selecting an item to place on order.
         flexContainer.addEventListener("click", function (e) {
           e.preventDefault();
           if (document.getElementById(`${e.target.id}`)) {
@@ -326,8 +332,7 @@
         });
       });
 
-      const option99 = document.getElementById("option99");
-
+      // Event function for button 99.
       option99.addEventListener("click", function (e) {
         e.preventDefault();
         socket.emit("completed_orders", "order completed");
@@ -348,6 +353,7 @@
         }
       });
 
+      // Event function for button 98.
       option98.addEventListener("click", function (e) {
         orderSection.style.display = "grid";
         socket.emit("generate_completed_orders", true);
@@ -377,8 +383,7 @@
         });
       });
 
-      const option97 = document.getElementById("option97");
-
+      // Event function for button 97.
       option97.addEventListener("click", function (e) {
         e.preventDefault();
 
@@ -399,7 +404,7 @@
         }
       });
 
-      const option0 = document.getElementById("option0");
+      // Event function for button 0.
       option0.addEventListener("click", function (e) {
         e.preventDefault();
         socket.emit("emit_to_cancel_order", 0);

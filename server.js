@@ -141,25 +141,3 @@ io.on("connection", async (socket) => {
 http.listen(PORT, () => {
   console.log("Server running on 3000");
 });
-
-// STEPS:
-// when you click 1., the list of items displays on the web, then you click on an item
-// to add it to your cart, when an item is clicked, it should display "added to cart✔",
-// also  the button 1. should be disabled after clicking it to list items for order
-
-// when an item is clicked, it should be added to an array (savedItems) with its timestamp in the backend
-
-// when a customer clicks 99, the items should disapper, a variable like "orderCompleted: true"
-//  should be added to the items placed for order, and also show a nice message saying:
-// "order completed!" or "no order to place" if theres no item in the array created as stated in [54]...
-// and in this case, the option1. button should be enabled and working
-
-// when a customer clicks 98, all items with the var "orderCompleted: true" should be displayed on the web
-
-// when a customer clicks 97, the last item in the array should be displayed
-// when a customer clicks 0, the last item in the array should be removed from the array
-// if no order to remove, display "no order to cancel, press 1 to place an order"
-
-// sessions
-// center, then put 99, 97 and 0 messages in a border and make it bold and big
-// make it so that when we click btn1, btn98 becomes enabled if it was disabled and also btn98 view disappears if its present

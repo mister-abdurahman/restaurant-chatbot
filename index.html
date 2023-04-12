@@ -291,7 +291,7 @@
         flexContainer.innerHTML = `
         <span class="empty" id="empty"></span>
         `;
-        orderMsg.innerText = "";
+        if (orderMsg) orderMsg.innerText = "";
       });
 
       socket.on("the_items_to_order", (data) => {
